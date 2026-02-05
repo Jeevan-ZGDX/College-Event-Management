@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - VIT Event Management Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #a8c4a8 0%, #c4d4c4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .logo h1 {
+            color: #3d4f5c;
+            font-size: 1.8rem;
+            margin-top: 1rem;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            color: #3d4f5c;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #3d4f5c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #2c3e4a;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .demo-credentials {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .demo-credentials h3 {
+            color: #3d4f5c;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-credentials p {
+            margin: 0.25rem 0;
+            color: #666;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <svg width="80" height="80" viewBox="0 0 50 50" fill="none">
+                <circle cx="25" cy="25" r="23" stroke="#3d4f5c" stroke-width="2"/>
+                <text x="25" y="32" text-anchor="middle" fill="#3d4f5c" font-size="20" font-family="serif" font-weight="bold">VIT</text>
+            </svg>
+            <h1>VIT Event Management</h1>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <h2>Student Login</h2>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Login</button>
+            
+            <div class="error-message" id="errorMessage">
+                Invalid username or password. Please try again.
+            </div>
+        </form>
+        
+        <div class="demo-credentials">
+            <h3>Demo Credentials</h3>
+            <p><strong>Username:</strong> student</p>
+            <p><strong>Password:</strong> vit123</p>
+            <p><em>Use these credentials for testing</em></p>
+        </div>
+    </div>
+
+    <script>
+        // Dummy user credentials
+        const validCredentials = [
+            { username: 'student', password: 'vit123', name: 'John Doe', email: 'john.doe@vit.ac.in' },
+            { username: 'student2', password: 'vit456', name: 'Jane Smith', email: 'jane.smith@vit.ac.in' }
+        ];
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Check credentials
+            const user = validCredentials.find(cred => 
+                cred.username === username && cred.password === password
+            );
+            
+            if (user) {
+                // Store user info in localStorage
+                localStorage.setItem('loggedInUser', JSON.stringify({
+                    username: user.username,
+                    name: user.name,
+                    email: user.email,
+                    loggedIn: true
+                }));
+                
+                // Redirect to main page
+                window.location.href = 'main.html';
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

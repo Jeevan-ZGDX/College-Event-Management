@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - VIT Event Management Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: #3d4f5c;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .user-info span {
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-title {
+            text-align: center;
+            color: #3d4f5c;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        /* Organization Registration */
+        .org-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .org-section h2 {
+            color: #3d4f5c;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f4f1a8;
+            padding-bottom: 0.5rem;
+        }
+
+        .org-registered {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .org-registered h3 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Event Management */
+        .event-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .event-section h2 {
+            color: #3d4f5c;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f4f1a8;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .toggle-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #3d4f5c;
+            color: white;
+        }
+
+        .form-section, .list-section {
+            display: none;
+        }
+
+        .form-section.active, .list-section.active {
+            display: block;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background: #3d4f5c;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #2c3e4a;
+        }
+
+        /* Event List */
+        .event-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .event-item {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #f4f1a8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-info h3 {
+            color: #3d4f5c;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-info p {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .event-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="white">
+                <circle cx="25" cy="25" r="23" stroke="white" stroke-width="2" fill="none"/>
+                <text x="25" y="32" text-anchor="middle" fill="white" font-size="20" font-family="serif" font-weight="bold">VIT</text>
+            </svg>
+            <span style="color: white; font-weight: bold;">Admin Dashboard</span>
+        </div>
+        <div class="user-info">
+            <span id="adminName">Welcome, Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="dashboard-title">VIT Event Management - Admin Dashboard</h1>
+
+        <!-- Organization Registration Section -->
+        <section class="org-section" id="orgSection">
+            <h2>Organization Registration</h2>
+            <div id="orgStatus">
+                <!-- Organization status will be shown here -->
+            </div>
+            <form id="orgForm" style="display: none;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="orgName">Organization Name</label>
+                        <input type="text" id="orgName" name="orgName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orgType">Organization Type</label>
+                        <select id="orgType" name="orgType" required>
+                            <option value="">Select Type</option>
+                            <option value="university">University</option>
+                            <option value="college">College</option>
+                            <option value="company">Company</option>
+                            <option value="ngo">NGO</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orgEmail">Email</label>
+                        <input type="email" id="orgEmail" name="orgEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orgPhone">Phone</label>
+                        <input type="tel" id="orgPhone" name="orgPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orgAddress">Address</label>
+                        <textarea id="orgAddress" name="orgAddress" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="orgWebsite">Website (Optional)</label>
+                        <input type="url" id="orgWebsite" name="orgWebsite">
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Register Organization</button>
+            </form>
+        </section>
+
+        <!-- Event Management Section -->
+        <section class="event-section" id="eventSection" style="display: none;">
+            <h2>Event Management</h2>
+            
+            <div class="section-toggle">
+                <button class="toggle-btn active" onclick="showSection('add')">Add New Event</button>
+                <button class="toggle-btn" onclick="showSection('list')">Manage Events</button>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="message" class="message"></div>
+
+            <!-- Add Event Form -->
+            <div class="form-section active" id="addEventSection">
+                <form id="eventForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="eventTitle">Event Title</label>
+                            <input type="text" id="eventTitle" name="eventTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventType">Event Type</label>
+                            <select id="eventType" name="eventType" required>
+                                <option value="">Select Type</option>
+                                <option value="Non-VITian">Non-VITian</option>
+                                <option value="VITian">VITian</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventSubType">Sub Type</label>
+                            <input type="text" id="eventSubType" name="eventSubType" required placeholder="e.g., Faculty-Internal, Student-External">
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDate">Event Date</label>
+                            <input type="date" id="eventDate" name="eventDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventMode">Event Mode</label>
+                            <select id="eventMode" name="eventMode" required>
+                                <option value="Online">Online</option>
+                                <option value="Offline">Offline</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventPrice">Price (₹)</label>
+                            <input type="number" id="eventPrice" name="eventPrice" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCategory">Category</label>
+                            <select id="eventCategory" name="eventCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="technical">Technical Events</option>
+                                <option value="cultural">Cultural Events</option>
+                                <option value="workshop">Workshops</option>
+                                <option value="fdp">FDP Programs</option>
+                                <option value="hackathon">Hackathons</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="eventDescription">Event Description</label>
+                            <textarea id="eventDescription" name="eventDescription" required placeholder="Provide detailed description of the event..."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Event</button>
+                </form>
+            </div>
+
+            <!-- Event List -->
+            <div class="list-section" id="eventListSection">
+                <div id="eventList">
+                    <!-- Events will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Default events
+        const defaultEvents = [
+            {
+                id: 1,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Research Scholar-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for research scholars, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 2,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Faculty-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 299,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 3,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(UG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for undergraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 4,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(PG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for postgraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 5,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "VITian",
+                subType: "(Faculty-Internal)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 0,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for internal faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 6,
+                title: "5G Hackathon",
+                type: "VITian",
+                subType: "(Student-Internal)",
+                date: "2026-02-10",
+                mode: "Offline",
+                price: 0,
+                downloads: 2,
+                category: "hackathon",
+                description: "Join our exciting 5G Hackathon where students can showcase their innovation in 5G technology. Teams will work on real-world problems, develop prototypes, and compete for prizes. This offline event includes mentorship, workshops, and networking opportunities with industry experts."
+            }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminLogin();
+            loadOrganizationData();
+            loadEvents();
+        });
+
+        function checkAdminLogin() {
+            const loggedInAdmin = JSON.parse(localStorage.getItem('loggedInAdmin'));
+            if (!loggedInAdmin || !loggedInAdmin.loggedIn) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            document.getElementById('adminName').textContent = `Welcome, ${loggedInAdmin.name}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInAdmin');
+            window.location.href = 'main.html';
+        }
+
+        function loadOrganizationData() {
+            const orgData = JSON.parse(localStorage.getItem('organizationData'));
+            const orgStatus = document.getElementById('orgStatus');
+            const orgForm = document.getElementById('orgForm');
+            const eventSection = document.getElementById('eventSection');
+
+            if (orgData) {
+                orgStatus.innerHTML = `
+                    <div class="org-registered">
+                        <h3>Organization Registered</h3>
+                        <p><strong>Name:</strong> ${orgData.name}</p>
+                        <p><strong>Type:</strong> ${orgData.type}</p>
+                        <p><strong>Email:</strong> ${orgData.email}</p>
+                        <p><strong>Phone:</strong> ${orgData.phone}</p>
+                    </div>
+                `;
+                orgForm.style.display = 'none';
+                eventSection.style.display = 'block';
+            } else {
+                orgStatus.innerHTML = '<p>Please register your organization first to manage events.</p>';
+                orgForm.style.display = 'block';
+                eventSection.style.display = 'none';
+            }
+        }
+
+        function loadEvents() {
+            const storedEvents = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            const eventList = document.getElementById('eventList');
+            
+            if (storedEvents.length === 0) {
+                eventList.innerHTML = '<p>No events found. Add your first event!</p>';
+                return;
+            }
+
+            eventList.innerHTML = storedEvents.map(event => `
+                <div class="event-item">
+                    <div class="event-info">
+                        <h3>${event.title}</h3>
+                        <p><strong>Type:</strong> ${event.type} ${event.subType}</p>
+                        <p><strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+                        <p><strong>Mode:</strong> ${event.mode} | <strong>Price:</strong> ₹${event.price}</p>
+                    </div>
+                    <div class="event-actions">
+                        <button class="action-btn edit-btn" onclick="editEvent(${event.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteEvent(${event.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Organization Form
+        document.getElementById('orgForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const orgData = {
+                name: formData.get('orgName'),
+                type: formData.get('orgType'),
+                email: formData.get('orgEmail'),
+                phone: formData.get('orgPhone'),
+                address: formData.get('orgAddress'),
+                website: formData.get('orgWebsite'),
+                registeredAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('organizationData', JSON.stringify(orgData));
+            showMessage('Organization registered successfully!', 'success');
+            loadOrganizationData();
+        });
+
+        // Event Form
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const storedEvents = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            const maxId = storedEvents.length > 0 ? Math.max(...storedEvents.map(e => e.id)) : 0;
+            
+            const formData = new FormData(e.target);
+            const newEvent = {
+                id: maxId + 1,
+                title: formData.get('eventTitle'),
+                type: formData.get('eventType'),
+                subType: `(${formData.get('eventSubType')})`,
+                date: formData.get('eventDate'),
+                mode: formData.get('eventMode'),
+                price: parseInt(formData.get('eventPrice')),
+                downloads: 0,
+                category: formData.get('eventCategory'),
+                description: formData.get('eventDescription')
+            };
+
+            storedEvents.push(newEvent);
+            localStorage.setItem('events', JSON.stringify(storedEvents));
+            
+            showMessage('Event added successfully!', 'success');
+            e.target.reset();
+            loadEvents();
+        });
+
+        function showSection(section) {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form-section, .list-section').forEach(sec => sec.classList.remove('active'));
+            
+            if (section === 'add') {
+                document.querySelector('button[onclick="showSection(\'add\')"]').classList.add('active');
+                document.getElementById('addEventSection').classList.add('active');
+            } else {
+                document.querySelector('button[onclick="showSection(\'list\')"]').classList.add('active');
+                document.getElementById('eventListSection').classList.add('active');
+            }
+        }
+
+        function editEvent(eventId) {
+            const storedEvents = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            const event = storedEvents.find(e => e.id === eventId);
+            
+            if (event) {
+                // Populate form with event data
+                document.getElementById('eventTitle').value = event.title;
+                document.getElementById('eventType').value = event.type;
+                document.getElementById('eventSubType').value = event.subType.replace(/[()]/g, '');
+                document.getElementById('eventDate').value = event.date;
+                document.getElementById('eventMode').value = event.mode;
+                document.getElementById('eventPrice').value = event.price;
+                document.getElementById('eventCategory').value = event.category;
+                document.getElementById('eventDescription').value = event.description;
+                
+                // Switch to add form and change button text
+                showSection('add');
+                const submitBtn = document.querySelector('#eventForm .submit-btn');
+                submitBtn.textContent = 'Update Event';
+                submitBtn.onclick = () => updateEvent(eventId);
+            }
+        }
+
+        function updateEvent(eventId) {
+            const storedEvents = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            const eventIndex = storedEvents.findIndex(e => e.id === eventId);
+            
+            if (eventIndex !== -1) {
+                const formData = new FormData(document.getElementById('eventForm'));
+                storedEvents[eventIndex] = {
+                    ...storedEvents[eventIndex],
+                    title: formData.get('eventTitle'),
+                    type: formData.get('eventType'),
+                    subType: `(${formData.get('eventSubType')})`,
+                    date: formData.get('eventDate'),
+                    mode: formData.get('eventMode'),
+                    price: parseInt(formData.get('eventPrice')),
+                    category: formData.get('eventCategory'),
+                    description: formData.get('eventDescription')
+                };
+                
+                localStorage.setItem('events', JSON.stringify(storedEvents));
+                showMessage('Event updated successfully!', 'success');
+                document.getElementById('eventForm').reset();
+                const submitBtn = document.querySelector('#eventForm .submit-btn');
+                submitBtn.textContent = 'Add Event';
+                submitBtn.onclick = null;
+                loadEvents();
+            }
+        }
+
+        function deleteEvent(eventId) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                const storedEvents = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+                const filteredEvents = storedEvents.filter(e => e.id !== eventId);
+                localStorage.setItem('events', JSON.stringify(filteredEvents));
+                showMessage('Event deleted successfully!', 'success');
+                loadEvents();
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

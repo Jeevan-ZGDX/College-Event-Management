@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIT Event Management Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #e8e8e8;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3d4f5c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            background: #3d4f5c;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(61, 79, 92, 0.95);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Header */
+        header {
+            background: #3d4f5c;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .login-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #ede989;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .user-info span {
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #a8c4a8 0%, #c4d4c4 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: inset 0 -3px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: white;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: white;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Search Section */
+        .search-section {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-select {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: #666;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .search-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #ede989;
+        }
+
+        /* About Section */
+        .about {
+            background: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .about h2 {
+            font-size: 2.5rem;
+            color: #3d4f5c;
+            margin-bottom: 1rem;
+        }
+
+        .about p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            background: #f9f9f9;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .feature h3 {
+            color: #3d4f5c;
+            margin-bottom: 1rem;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Events Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Event Card */
+        .event-card {
+            background: #3d4f5c;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transform: translateY(0);
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 241, 168, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .event-card:hover::before {
+            left: 100%;
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .event-card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+
+        .event-title {
+            font-size: 1.6rem;
+            color: #f4f1a8;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .event-card:hover .event-title {
+            color: #fff;
+        }
+
+        .event-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover .event-info {
+            transform: translateX(5px);
+        }
+
+        .event-info svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover .event-info svg {
+            transform: scale(1.1);
+        }
+
+        .event-type {
+            color: #d4d4d4;
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .event-card:hover .event-type {
+            color: #f4f1a8;
+        }
+
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            transition: border-color 0.3s ease;
+        }
+
+        .event-card:hover .event-meta {
+            border-color: rgba(244, 241, 168, 0.4);
+        }
+
+        .event-price {
+            color: white;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover .event-price {
+            transform: scale(1.05);
+        }
+
+        .event-downloads {
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover .event-downloads {
+            transform: scale(1.05);
+        }
+
+        .view-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: block;
+            margin-left: auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(244, 241, 168, 0.3);
+        }
+
+        .view-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .view-btn:hover::before {
+            left: 100%;
+        }
+
+        .view-btn:hover {
+            background: #ede989;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(244, 241, 168, 0.4);
+        }
+
+        .view-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: white;
+            font-size: 0.9rem;
+            background: rgba(244, 241, 168, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover .mode-badge {
+            background: rgba(244, 241, 168, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        footer {
+            background: #3d4f5c;
+            color: white;
+            padding: 2rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Notification System */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .notification.warning {
+            background: #ff9800;
+        }
+
+        /* Scroll to Top Button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #3d4f5c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Enhanced Mobile Menu */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            nav {
+                position: fixed;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #3d4f5c;
+                flex-direction: column;
+                padding: 2rem;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            }
+
+            nav.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            nav a {
+                padding: 1rem;
+                margin: 0.5rem 0;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .hero {
+                padding: 6rem 1rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .event-card {
+                padding: 1.5rem;
+            }
+
+            .event-title {
+                font-size: 1.4rem;
+            }
+
+            .search-section {
+                padding: 2rem 1rem;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 200px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .scroll-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+                transform: translateY(-100px);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        /* Tablet Styles */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .events-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Loading States */
+        .loading-state {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-state::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="white">
+                <circle cx="25" cy="25" r="23" stroke="white" stroke-width="2" fill="none"/>
+                <text x="25" y="32" text-anchor="middle" fill="white" font-size="20" font-family="serif" font-weight="bold">VIT</text>
+            </svg>
+        </div>
+        <div id="userSection">
+            <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>VIT Event Management Portal</h1>
+        <p>Discover, register, and manage events at Vellore Institute of Technology</p>
+        
+        <div class="search-section">
+            <select class="search-select" id="eventFilter">
+                <option value="">Select</option>
+                <option value="technical">Technical Events</option>
+                <option value="cultural">Cultural Events</option>
+                <option value="workshop">Workshops</option>
+                <option value="fdp">FDP Programs</option>
+                <option value="hackathon">Hackathons</option>
+            </select>
+            <button class="search-btn" onclick="filterEvents()">Search</button>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <h2>About VIT Event Management Portal</h2>
+            <p>Welcome to the VIT Event Management Portal, your one-stop destination for all events at Vellore Institute of Technology. Whether you're a student, faculty, or external participant, our platform helps you discover, register, and manage various events including technical workshops, cultural festivals, hackathons, and faculty development programs.</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Easy Registration</h3>
+                    <p>Seamlessly register for events with our user-friendly interface.</p>
+                </div>
+                <div class="feature">
+                    <h3>Event Discovery</h3>
+                    <p>Find events that match your interests and schedule.</p>
+                </div>
+                <div class="feature">
+                    <h3>Real-time Updates</h3>
+                    <p>Get notified about event changes and new opportunities.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Container -->
+    <div class="container">
+        <div class="events-grid" id="eventsGrid">
+            <!-- Events will be populated here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 VIT Event Management Portal. All rights reserved.</p>
+            <p>Contact: events@vit.ac.in | Phone: +91-416-220-2157</p>
+            <p><a href="admin-login.html" style="color: #f4f1a8; text-decoration: none;">Admin Login</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let isLoading = false;
+        let currentFilter = '';
+
+        // Loading screen management
+        function showLoading() {
+            const loading = document.querySelector('.loading');
+            if (loading) {
+                loading.classList.remove('hidden');
+                isLoading = true;
+            }
+        }
+
+        function hideLoading() {
+            const loading = document.querySelector('.loading');
+            if (loading) {
+                setTimeout(() => {
+                    loading.classList.add('hidden');
+                    isLoading = false;
+                }, 300);
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success', duration = 3000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Trigger animation
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            // Auto remove
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
+        }
+
+        // Scroll effects
+        function handleScroll() {
+            const header = document.querySelector('header');
+            const scrollTopBtn = document.querySelector('.scroll-to-top');
+            const scrolled = window.pageYOffset > 100;
+
+            // Header scroll effect
+            if (scrolled) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+
+            // Scroll to top button
+            if (scrollTopBtn) {
+                if (window.pageYOffset > 300) {
+                    scrollTopBtn.classList.add('show');
+                } else {
+                    scrollTopBtn.classList.remove('show');
+                }
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const nav = document.querySelector('nav');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (nav && menuToggle) {
+                nav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            }
+        }
+
+        // Smooth scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Intersection Observer for animations
+        function createIntersectionObserver() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe event cards
+            document.querySelectorAll('.event-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Observe features
+            document.querySelectorAll('.feature').forEach(feature => {
+                observer.observe(feature);
+            });
+        }
+
+        // Enhanced event card creation with animations
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card slide-up';
+
+            const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            card.innerHTML = `
+                <h3 class="event-title">${event.title}</h3>
+
+                <div class="event-info">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <span>${event.type}</span>
+                </div>
+
+                <div class="event-type">${event.subType}</div>
+
+                <div class="event-info">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                    <span>${formattedDate}</span>
+                </div>
+
+                <div class="event-info mode-badge">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>${event.mode}</span>
+                </div>
+
+                <div class="event-meta">
+                    <div class="event-price">
+                        <span>₹</span>
+                        <span>${event.price}</span>
+                    </div>
+                    <div class="event-downloads">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                        <span>${event.downloads}</span>
+                    </div>
+                </div>
+
+                <button class="view-btn" onclick="viewEvent(${event.id})">View Details</button>
+            `;
+
+            // Add click animation
+            card.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('view-btn')) {
+                    this.style.transform = 'translateY(-6px) scale(1.03)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+
+            return card;
+        }
+
+        // Enhanced display events with loading states
+        function displayEvents(eventsToShow = events) {
+            const grid = document.getElementById('eventsGrid');
+
+            if (isLoading) return;
+
+            showLoading();
+
+            setTimeout(() => {
+                grid.innerHTML = '';
+
+                if (eventsToShow.length === 0) {
+                    grid.innerHTML = `
+                        <div class="no-events" style="
+                            grid-column: 1 / -1;
+                            text-align: center;
+                            padding: 3rem;
+                            color: #666;
+                            font-size: 1.2rem;
+                        ">
+                            <svg viewBox="0 0 24 24" width="64" height="64" style="fill: #ccc; margin-bottom: 1rem;">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                            <p>No events found matching your criteria.</p>
+                            <p style="font-size: 1rem; margin-top: 0.5rem;">Try adjusting your search filters.</p>
+                        </div>
+                    `;
+                } else {
+                    eventsToShow.forEach((event, index) => {
+                        const card = createEventCard(event);
+                        // Stagger animation
+                        setTimeout(() => {
+                            grid.appendChild(card);
+                        }, index * 100);
+                    });
+                }
+
+                hideLoading();
+
+                // Re-initialize intersection observer for new cards
+                setTimeout(createIntersectionObserver, 100);
+            }, 300);
+        }
+
+        // Enhanced filter events with feedback
+        function filterEvents() {
+            const filterSelect = document.getElementById('eventFilter');
+            const filter = filterSelect.value;
+            currentFilter = filter;
+
+            if (!filter) {
+                displayEvents(events);
+                showNotification('Showing all events', 'info', 2000);
+                return;
+            }
+
+            const filtered = events.filter(event => event.category === filter);
+            displayEvents(filtered);
+
+            const categoryNames = {
+                'technical': 'Technical Events',
+                'cultural': 'Cultural Events',
+                'workshop': 'Workshops',
+                'fdp': 'FDP Programs',
+                'hackathon': 'Hackathons'
+            };
+
+            showNotification(`Showing ${filtered.length} ${categoryNames[filter] || filter} events`, 'success', 2500);
+        }
+
+        // Enhanced view event with loading feedback
+        function viewEvent(eventId) {
+            showNotification('Loading event details...', 'info', 1500);
+            setTimeout(() => {
+                window.location.href = `event-details.html?id=${eventId}`;
+            }, 300);
+        }
+
+        // Enhanced search functionality
+        function searchEvents(query) {
+            if (!query.trim()) {
+                displayEvents(currentFilter ? events.filter(event => event.category === currentFilter) : events);
+                return;
+            }
+
+            const filtered = events.filter(event =>
+                event.title.toLowerCase().includes(query.toLowerCase()) ||
+                event.description.toLowerCase().includes(query.toLowerCase()) ||
+                event.type.toLowerCase().includes(query.toLowerCase())
+            );
+
+            displayEvents(filtered);
+            showNotification(`Found ${filtered.length} events matching "${query}"`, 'success', 2500);
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading screen to body
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div>';
+            document.body.appendChild(loadingDiv);
+
+            // Add scroll to top button
+            const scrollBtn = document.createElement('button');
+            scrollBtn.className = 'scroll-to-top';
+            scrollBtn.innerHTML = '↑';
+            scrollBtn.onclick = scrollToTop;
+            document.body.appendChild(scrollBtn);
+
+            // Add mobile menu toggle
+            const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
+            if (nav && window.innerWidth <= 768) {
+                const menuToggle = document.createElement('div');
+                menuToggle.className = 'menu-toggle';
+                menuToggle.innerHTML = '<span></span><span></span><span></span>';
+                menuToggle.onclick = toggleMobileMenu;
+                header.appendChild(menuToggle);
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!header.contains(e.target) && nav.classList.contains('active')) {
+                        toggleMobileMenu();
+                    }
+                });
+            }
+
+            // Initialize scroll effects
+            window.addEventListener('scroll', handleScroll);
+
+            // Initialize intersection observer
+            createIntersectionObserver();
+
+            // Add search input functionality
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        searchEvents(this.value);
+                    }, 300);
+                });
+            }
+
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + K to focus search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    const searchInput = document.querySelector('.search-input');
+                    if (searchInput) {
+                        searchInput.focus();
+                        showNotification('Search activated - type to find events', 'info', 2000);
+                    }
+                }
+
+                // Escape to clear search
+                if (e.key === 'Escape') {
+                    const searchInput = document.querySelector('.search-input');
+                    if (searchInput && searchInput.value) {
+                        searchInput.value = '';
+                        searchEvents('');
+                        showNotification('Search cleared', 'info', 1500);
+                    }
+                }
+            });
+
+            // Hide loading screen after initial load
+            setTimeout(hideLoading, 500);
+        });
+
+        // Default events
+        const defaultEvents = [
+            {
+                id: 1,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Research Scholar-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for research scholars, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 2,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Faculty-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 299,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 3,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(UG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for undergraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 4,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(PG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for postgraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 5,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "VITian",
+                subType: "(Faculty-Internal)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 0,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for internal faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 6,
+                title: "5G Hackathon",
+                type: "VITian",
+                subType: "(Student-Internal)",
+                date: "2026-02-10",
+                mode: "Offline",
+                price: 0,
+                downloads: 2,
+                category: "hackathon",
+                description: "Join our exciting 5G Hackathon where students can showcase their innovation in 5G technology. Teams will work on real-world problems, develop prototypes, and compete for prizes. This offline event includes mentorship, workshops, and networking opportunities with industry experts."
+            }
+        ];
+
+        // Load events from backend API
+        let events = [];
+
+        async function loadEvents() {
+            try {
+                const response = await fetch('http://localhost:5000/api/events');
+                if (response.ok) {
+                    events = await response.json();
+                } else {
+                    // Fallback to localStorage if backend is not available
+                    events = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+                    console.warn('Backend not available, using localStorage events');
+                }
+            } catch (error) {
+                console.error('Error loading events from backend:', error);
+                // Fallback to localStorage
+                events = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            }
+            
+            displayEvents();
+        }
+
+        // Initialize
+        loadEvents();
+
+        // Check login status
+        function checkLoginStatus() {
+            const userSection = document.getElementById('userSection');
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+            if (loggedInUser && loggedInUser.loggedIn) {
+                userSection.innerHTML = `
+                    <div class="user-info">
+                        <span>Welcome, ${loggedInUser.name}</span>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                `;
+            } else {
+                userSection.innerHTML = `
+                    <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+                `;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            showNotification('Logged out successfully', 'info', 2000);
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+        }
+
+        // Initialize login status on page load
+        checkLoginStatus();
+    </script>
+</body>
+</html>

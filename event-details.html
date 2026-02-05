@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - VIT Event Management Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #e8e8e8;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3d4f5c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            background: #3d4f5c;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(61, 79, 92, 0.95);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-2px);
+        }
+
+        .login-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #ede989;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .user-info span {
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+
+        /* Event Details Section */
+        .event-details {
+            background: white;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .event-details h1 {
+            font-size: 2.5rem;
+            color: #3d4f5c;
+            margin-bottom: 1rem;
+        }
+
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        .meta-item svg {
+            width: 20px;
+            height: 20px;
+            fill: #3d4f5c;
+        }
+
+        .event-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 3rem;
+        }
+
+        .register-btn {
+            background: #f4f1a8;
+            color: #3d4f5c;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .register-btn:hover {
+            background: #ede989;
+            transform: scale(1.05);
+        }
+
+        /* Registration Form */
+        .registration-form {
+            display: none;
+            background: #f9f9f9;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .registration-form h2 {
+            color: #3d4f5c;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .participation-type {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .participation-type input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .member-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background: #fafafa;
+        }
+
+        .member-section h3 {
+            color: #3d4f5c;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .fee-payment {
+            margin-bottom: 1.5rem;
+        }
+
+        .fee-payment label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .fee-payment input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .submit-btn {
+            background: #3d4f5c;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #2c3e4a;
+        }
+
+        .qr-payment {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .qr-payment h3 {
+            color: #3d4f5c;
+            margin-bottom: 1rem;
+        }
+
+        .qr-payment p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .qr-payment img {
+            max-width: 200px;
+            height: auto;
+            margin: 1rem 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .qr-note {
+            font-size: 0.9rem;
+            color: #777;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            background: #3d4f5c;
+            color: white;
+            padding: 2rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .event-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="white">
+                <circle cx="25" cy="25" r="23" stroke="white" stroke-width="2" fill="none"/>
+                <text x="25" y="32" text-anchor="middle" fill="white" font-size="20" font-family="serif" font-weight="bold">VIT</text>
+            </svg>
+        </div>
+        <div id="userSection">
+            <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+        </div>
+    </header>
+
+    <!-- Event Details Section -->
+    <section class="event-details" id="eventDetails">
+        <!-- Event details will be populated here -->
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 VIT Event Management Portal. All rights reserved.</p>
+            <p>Contact: events@vit.ac.in | Phone: +91-416-220-2157</p>
+        </div>
+    </footer>
+
+    <script>
+        // Default events
+        const defaultEvents = [
+            {
+                id: 1,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Research Scholar-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for research scholars, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 2,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(Faculty-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 299,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 3,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(UG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for undergraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 4,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "Non-VITian",
+                subType: "(PG Student-External)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 199,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for postgraduate students, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 5,
+                title: "5 Days Online FDP on Agentic AI",
+                type: "VITian",
+                subType: "(Faculty-Internal)",
+                date: "2026-01-27",
+                mode: "Online",
+                price: 0,
+                downloads: 1,
+                category: "fdp",
+                description: "This 5-day Faculty Development Program on Agentic AI covers advanced topics in artificial intelligence, including autonomous agents, machine learning algorithms, and practical applications. Designed for internal faculty members, this program includes interactive sessions, case studies, and hands-on projects to enhance your understanding of AI technologies."
+            },
+            {
+                id: 6,
+                title: "5G Hackathon",
+                type: "VITian",
+                subType: "(Student-Internal)",
+                date: "2026-02-10",
+                mode: "Offline",
+                price: 0,
+                downloads: 2,
+                category: "hackathon",
+                description: "Join our exciting 5G Hackathon where students can showcase their innovation in 5G technology. Teams will work on real-world problems, develop prototypes, and compete for prizes. This offline event includes mentorship, workshops, and networking opportunities with industry experts."
+            }
+        ];
+
+        // Load events from backend API
+        let events = [];
+
+        async function loadEvents() {
+            try {
+                const response = await fetch('http://localhost:5000/api/events');
+                if (response.ok) {
+                    events = await response.json();
+                } else {
+                    // Fallback to localStorage if backend is not available
+                    events = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+                    console.warn('Backend not available, using localStorage events');
+                }
+            } catch (error) {
+                console.error('Error loading events from backend:', error);
+                // Fallback to localStorage
+                events = JSON.parse(localStorage.getItem('events')) || defaultEvents;
+            }
+            
+            displayEventDetails();
+        }
+
+        function getEventIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return parseInt(urlParams.get('id'));
+        }
+
+        function displayEventDetails() {
+            const eventId = getEventIdFromURL();
+            const event = events.find(e => e.id === eventId);
+
+            if (!event) {
+                document.getElementById('eventDetails').innerHTML = '<p>Event not found.</p>';
+                return;
+            }
+
+            const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            document.getElementById('eventDetails').innerHTML = `
+                <h1>${event.title}</h1>
+                <div class="event-meta">
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <span>${event.type} ${event.subType}</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                        </svg>
+                        <span>${formattedDate}</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span>${event.mode}</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span>₹${event.price}</span>
+                    </div>
+                </div>
+                <div class="event-description">
+                    <p>${event.description}</p>
+                </div>
+                <button class="register-btn" onclick="showRegistrationForm()">Register for Event</button>
+                <div class="registration-form" id="registrationForm">
+                    <div id="qrSection" style="display: none;"></div>
+                    <h2>Registration Form</h2>
+                    <form id="regForm" onsubmit="submitRegistration(event)">
+                        <div class="form-group">
+                            <label>Participation Type</label>
+                            <div class="participation-type">
+                                <input type="radio" id="individual" name="participationType" value="individual" checked onchange="toggleParticipationType()">
+                                <label for="individual">Individual</label>
+                                <input type="radio" id="team" name="participationType" value="team" onchange="toggleParticipationType()">
+                                <label for="team">Team</label>
+                            </div>
+                        </div>
+                        <div class="form-group" id="teamSizeGroup" style="display: none;">
+                            <label for="teamSize">Number of Team Members (2-5)</label>
+                            <select id="teamSize" name="teamSize" onchange="generateTeamFields()">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div id="participantFields">
+                            <!-- Participant fields will be generated here -->
+                        </div>
+                        <div class="fee-payment">
+                            <label>Have you completed the fee payment?</label>
+                            <input type="radio" id="feeYes" name="feePaid" value="yes" required>
+                            <label for="feeYes">Yes</label>
+                            <input type="radio" id="feeNo" name="feePaid" value="no" required>
+                            <label for="feeNo">No</label>
+                        </div>
+                        <button type="submit" class="submit-btn">Complete Registration</button>
+                    </form>
+                </div>
+            `;
+        }
+
+        function showRegistrationForm() {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (!loggedInUser || !loggedInUser.loggedIn) {
+                alert('Please login first to register for events.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const eventId = getEventIdFromURL();
+            const event = events.find(e => e.id === eventId);
+            const form = document.getElementById('registrationForm');
+            const qrSection = document.getElementById('qrSection');
+            
+            form.style.display = 'block';
+            document.querySelector('.register-btn').style.display = 'none';
+            
+            if (event.price > 0) {
+                // Generate QR code using backend API
+                generatePaymentQR(event.price, event.name);
+            } else {
+                qrSection.style.display = 'none';
+            }
+        }
+
+        async function generatePaymentQR(amount, eventName) {
+            const qrSection = document.getElementById('qrSection');
+            
+            try {
+                // Create Razorpay order via backend
+                const orderResponse = await fetch('http://localhost:5000/api/create-payment-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        event_name: eventName
+                    })
+                });
+                
+                if (!orderResponse.ok) {
+                    throw new Error('Failed to create payment order');
+                }
+                
+                const orderData = await orderResponse.json();
+                
+                // Generate QR code via backend
+                const qrResponse = await fetch('http://localhost:5000/api/generate-qr', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        upi_id: 'events@vit.edu',
+                        payee_name: 'VIT Events',
+                        amount: amount,
+                        currency: 'INR',
+                        transaction_note: `Payment for ${eventName}`
+                    })
+                });
+                
+                if (!qrResponse.ok) {
+                    throw new Error('Failed to generate QR code');
+                }
+                
+                const qrData = await qrResponse.json();
+                
+                qrSection.innerHTML = `
+                    <div class="qr-payment">
+                        <h3>Payment Required</h3>
+                        <p>Please scan the QR code below to pay ₹${amount} for this event.</p>
+                        <img src="data:image/png;base64,${qrData.qr_code}" alt="Payment QR Code">
+                        <p class="qr-note">After payment, confirm below that you have completed the payment.</p>
+                        <p class="order-id">Order ID: ${orderData.order_id}</p>
+                    </div>
+                `;
+                qrSection.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error generating payment QR:', error);
+                qrSection.innerHTML = `
+                    <div class="qr-payment">
+                        <h3>Payment Error</h3>
+                        <p>Unable to generate payment QR code. Please try again later.</p>
+                        <p class="error-note">Error: ${error.message}</p>
+                    </div>
+                `;
+                qrSection.style.display = 'block';
+            }
+        }
+
+        function submitRegistration(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const feePaid = formData.get('feePaid');
+
+            if (feePaid === 'no') {
+                alert('Please complete the fee payment before registering.');
+                return;
+            }
+
+            // Here you would typically send the data to a server
+            alert('Registration successful! You will receive a confirmation email shortly.');
+            // Reset form or redirect
+            e.target.reset();
+            document.getElementById('registrationForm').style.display = 'none';
+            document.querySelector('.register-btn').style.display = 'block';
+        }
+
+        function toggleParticipationType() {
+            const participationType = document.querySelector('input[name="participationType"]:checked').value;
+            const teamSizeGroup = document.getElementById('teamSizeGroup');
+            
+            if (participationType === 'team') {
+                teamSizeGroup.style.display = 'block';
+                generateTeamFields();
+            } else {
+                teamSizeGroup.style.display = 'none';
+                generateTeamFields();
+            }
+        }
+
+        function generateTeamFields() {
+            const participationType = document.querySelector('input[name="participationType"]:checked').value;
+            const participantFields = document.getElementById('participantFields');
+            let numMembers = 1;
+            
+            if (participationType === 'team') {
+                numMembers = parseInt(document.getElementById('teamSize').value);
+            }
+            
+            let html = '';
+            for (let i = 1; i <= numMembers; i++) {
+                const memberTitle = numMembers > 1 ? `Team Member ${i}` : 'Participant';
+                html += `
+                    <div class="member-section">
+                        <h3>${memberTitle}</h3>
+                        <div class="form-group">
+                            <label for="name${i}">Full Name</label>
+                            <input type="text" id="name${i}" name="name${i}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email${i}">Email</label>
+                            <input type="email" id="email${i}" name="email${i}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="college${i}">College/University</label>
+                            <input type="text" id="college${i}" name="college${i}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone${i}">Phone Number</label>
+                            <input type="tel" id="phone${i}" name="phone${i}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category${i}">Category</label>
+                            <select id="category${i}" name="category${i}" required>
+                                <option value="">Select Category</option>
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                                <option value="researcher">Researcher</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            participantFields.innerHTML = html;
+        }
+
+        // Initialize
+        loadEvents();
+        generateTeamFields(); // Initialize with individual fields
+        checkLoginStatus();
+
+        function checkLoginStatus() {
+            const userSection = document.getElementById('userSection');
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            
+            if (loggedInUser && loggedInUser.loggedIn) {
+                userSection.innerHTML = `
+                    <div class="user-info">
+                        <span>Welcome, ${loggedInUser.name}</span>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                `;
+            } else {
+                userSection.innerHTML = `
+                    <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+                `;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'main.html';
+        }
+        generateTeamFields(); // Initialize with individual fields
+    </script>
+</body>
+</html>
